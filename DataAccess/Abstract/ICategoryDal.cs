@@ -5,8 +5,7 @@ using System.Text;
 
 namespace DataAccess.Abstract
 {
-    //Süper bir olay ***
-    public interface IProductDal:IEntityRepository<Product>
+    public interface ICategoryDal:IEntityRepository<Category>
     {
         
     }
