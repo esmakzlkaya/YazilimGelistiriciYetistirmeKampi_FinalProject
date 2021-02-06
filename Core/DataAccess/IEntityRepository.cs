@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
-using Entities.Abstract;
+using Core.Entities;
 
-namespace DataAccess.Abstract
+namespace Core.DataAccess
 {
     // Generic Repository Design Pattern
     // Generic Constraint - Kısıtlama

@@ -20,6 +20,7 @@ namespace DataAccess.Concrete.EntityFramework
         //Hangi class hangi tabloya karşılık geliyor onu belirliyoruz
         public DbSet<Category> Categories { get; set; }
         public DbSet<Customer> Customers { get; set; }
+        public DbSet<Order> Orders { get; set; }
 
 
 
