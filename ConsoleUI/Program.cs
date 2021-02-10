@@ -30,11 +30,17 @@ namespace ConsoleUI
         private static void ProductTest()
         {
             ProductManager productManager = new ProductManager(new EfProductDal());
-            foreach (var product in productManager.GetProductsDetails())
+            var result = productManager.GetProductsDetails();
+            if (result.Success)
             {
-                //join işlemi yapıldı categori adı da geldi
-                Console.WriteLine(product.ProductName+" / "+product.CategoryName);
+                foreach (var product in result.Data)
+                {
+                    //join işlemi yapıldı categori adı da geldi
+                    Console.WriteLine(product.ProductName + " / " + product.CategoryName);
+                }
             }
+            else
+            Console.WriteLine(result.Message);
         }
     }
 }
