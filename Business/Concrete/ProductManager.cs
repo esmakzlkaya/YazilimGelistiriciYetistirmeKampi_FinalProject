@@ -22,11 +22,11 @@ namespace Business.Concrete
 
         public IDataResult<List<Product>> GetAll()
         {
-            if (DateTime.Now.Hour==22)
-            {
-                return new ErrorDataResult<List<Product>>(Messages.MaintenanceTime);
-            }
-            return new SuccessDataResult<List<Product>>(_productDal.GetAll(),Messages.ProductsListed); 
+            //if (DateTime.Now.Hour == 23)
+            //{
+            //    return new ErrorDataResult<List<Product>>(Messages.MaintenanceTime);
+            //}
+            return new SuccessDataResult<List<Product>>(_productDal.GetAll(), Messages.ProductsListed);
         }
 
         public IDataResult<List<Product>> GetAllByCategoryId(int id)
@@ -36,12 +36,12 @@ namespace Business.Concrete
 
         public IDataResult<Product> GetByID(int id)
         {
-            return new SuccessDataResult<Product>(_productDal.Get(p=>p.ProductId==id));
+            return new SuccessDataResult<Product>(_productDal.Get(p => p.ProductId == id));
         }
 
         public IDataResult<List<Product>> GetByUnitPrice(decimal min, decimal max)
         {
-            return new SuccessDataResult<List<Product>>(_productDal.GetAll(p=>p.UnitPrice>=min && p.UnitPrice<=max));
+            return new SuccessDataResult<List<Product>>(_productDal.GetAll(p => p.UnitPrice >= min && p.UnitPrice <= max));
         }
 
         public IDataResult<List<ProductDetailDto>> GetProductsDetails()
@@ -54,10 +54,11 @@ namespace Business.Concrete
             */
             return new SuccessDataResult<List<ProductDetailDto>>(_productDal.GetProductDetails());
         }
-
+        // [LogAspect]--> AOP işlemine örnek
+        // sen nerede dersen orada çalışır,
         public IResult Add(Product product)
         {
-            if (product.ProductName.Length<=2)
+            if (product.ProductName.Length <= 2)
             {
                 //magic strings - "yazılan mesaj" gibi
                 return new ErrorResult(Messages.ProductNameInValid);
