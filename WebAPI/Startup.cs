@@ -32,14 +32,17 @@ namespace WebAPI
         //Build-in mimari yokken aþaðýdakiler bu iþi yapmayý saðlýyordu(IoC Container altyapýsý saðlýyordu)
         //AutoFac,Ninject, CastelWindsor, StructureMap, LightInject,DryInject --> IoC Container
         //AutoFac - AOP imkaný saðlýyor, projeye dahil edicez
+        //Postsharp
 
             services.AddControllers();
         //*** IProductService tipinde bir baðýmlýlýk görürsen product manager oluþtur/newle/referans ver, benim yerime sen yap
         // Biri senden IProductService isterse ona bir tane product manager newle arkaplanda
         //AddSingleton - Data tutulmuyorsa Singleton kullan
         //AddScoped - veri tutuluyorsa
-            services.AddSingleton<IProductService,ProductManager>();
-            services.AddSingleton<IProductDal, EfProductDal>();
+
+            //AutofacBusinessModule de yaptýk
+            //services.AddSingleton<IProductService,ProductManager>();
+            //services.AddSingleton<IProductDal, EfProductDal>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

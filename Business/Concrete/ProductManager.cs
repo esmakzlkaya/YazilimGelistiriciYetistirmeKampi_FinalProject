@@ -7,6 +7,10 @@ using System.Text;
 using Entities.DTOs;
 using Core.Utilities.Results;
 using Business.Constants;
+using FluentValidation;
+using Business.ValidationRules.FluentValidation;
+using Core.CrossCuttingConcerns.Validation.FluentValidation;
+using Core.Aspects.Autofac.Validation;
 
 namespace Business.Concrete
 {
@@ -56,16 +60,16 @@ namespace Business.Concrete
         }
         // [LogAspect]--> AOP işlemine örnek
         // sen nerede dersen orada çalışır,
+
+
+
+        //Cross cutting concerns - Log, cache, transacton, a
+
+        [ValidationAspect(typeof(ProductValidator))]
         public IResult Add(Product product)
         {
-            if (product.ProductName.Length <= 2)
-            {
-                //magic strings - "yazılan mesaj" gibi
-                return new ErrorResult(Messages.ProductNameInValid);
-            }
             _productDal.Add(product);
             return new SuccessResult(Messages.ProductAdded);
-            // or SuccessResult();
         }
 
         public IResult Delete(Product product)
