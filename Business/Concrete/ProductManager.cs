@@ -11,17 +11,22 @@ using FluentValidation;
 using Business.ValidationRules.FluentValidation;
 using Core.CrossCuttingConcerns.Validation.FluentValidation;
 using Core.Aspects.Autofac.Validation;
+using Business.CrossCuttingConcerns_Demo;
+using Core.Utilities.Business;
+using DataAccess.Concrete.EntityFramework;
 
 namespace Business.Concrete
 {
     public class ProductManager : IProductService
     {
         IProductDal _productDal;
+        ICategoryService _categoryService;
 
         //ProductManager newlendiğinde IProductDal referansı ver 
-        public ProductManager(IProductDal productDal)
+        public ProductManager(IProductDal productDal, ICategoryService categoryService)
         {
             _productDal = productDal;
+            _categoryService = categoryService;
         }
 
         public IDataResult<List<Product>> GetAll()
@@ -50,25 +55,27 @@ namespace Business.Concrete
 
         public IDataResult<List<ProductDetailDto>> GetProductsDetails()
         {
-            /*
-            if (DateTime.Now.Hour == 23)
-            {
-                return new ErrorDataResult<List<ProductDetailDto>>(Messages.MaintenanceTime);
-            }
-            */
             return new SuccessDataResult<List<ProductDetailDto>>(_productDal.GetProductDetails());
         }
         // [LogAspect]--> AOP işlemine örnek
         // sen nerede dersen orada çalışır,
 
+        //Cross cutting concerns - Log, cache, transaction yönetimi, authorization
 
-
-        //Cross cutting concerns - Log, cache, transacton, a
-
-        [ValidationAspect(typeof(ProductValidator))]
+        [ValidationAspect(typeof(ProductValidator))] // typeof ile attribute a tip atıyoruz
         public IResult Add(Product product)
         {
+            IResult result = BusinessRules.Run(
+                CheckIfProductCountOfCategoryCorrect(product.CategoryId),
+                CheckIfProductNameDuplicate(product.ProductName),
+                CheckIfCategoryLimitExceeded());
+
+            if (result != null) //hatalı kodlar kendi hata mesajıyla dönüyor, hatalı olmayanlara null döndük
+            {
+                return result; // hatalı logic, hata mesajı döner
+            }
             _productDal.Add(product);
+
             return new SuccessResult(Messages.ProductAdded);
         }
 
@@ -78,9 +85,50 @@ namespace Business.Concrete
             return new SuccessResult();
         }
 
+        [ValidationAspect(typeof(ProductValidator))]
         public IResult Update(Product product)
         {
+            IResult result = BusinessRules.Run(
+                CheckIfProductCountOfCategoryCorrect(product.CategoryId),
+                CheckIfProductNameDuplicate(product.ProductName),
+                CheckIfCategoryLimitExceeded());
+
+            if (result != null) //hatalı kodlar kendi hata mesajıyla dönüyor, hatalı olmayanlara null döndük
+            {
+                return result; // hatalı logic, hata mesajı döner
+            }
             _productDal.Update(product);
+            return new SuccessResult();
+        }
+        private IResult CheckIfProductCountOfCategoryCorrect(int categoryId)
+        {
+            var result = _productDal.GetAll(p => p.CategoryId == categoryId).Count;
+            if (result >= 10)
+            {
+                return new ErrorResult(Messages.ProductCountOfCategoryError);
+            }
+            return new SuccessResult();
+        }
+
+        private IResult CheckIfProductNameDuplicate(string productName)
+        {
+            var result = _productDal.GetAll(p => p.ProductName == productName);
+            if (result.Count > 0)
+            {
+                return new ErrorResult(Messages.ProductNameAlreadyExists);
+            }
+            return new SuccessResult();
+        }
+
+        //product için category nin nasıl yorumlandığını görmek için yaptık,
+        //    categoryService i sistemimize enjekte ettik
+        private IResult CheckIfCategoryLimitExceeded()
+        {
+            var result = _categoryService.GetAll();
+            if (result.Data.Count > 15)
+            {
+                return new ErrorResult(Messages.CategoryLimitExceeded);
+            }
             return new SuccessResult();
         }
     }
