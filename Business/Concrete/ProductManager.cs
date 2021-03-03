@@ -14,6 +14,9 @@ using Core.Aspects.Autofac.Validation;
 using Business.CrossCuttingConcerns_Demo;
 using Core.Utilities.Business;
 using DataAccess.Concrete.EntityFramework;
+using Business.BusinessAspects.Autofac;
+using Core.Aspects.Autofac.Caching;
+using Core.Aspects.Autofac.Transaction;
 
 namespace Business.Concrete
 {
@@ -29,6 +32,7 @@ namespace Business.Concrete
             _categoryService = categoryService;
         }
 
+        [CacheAspect] //key, value
         public IDataResult<List<Product>> GetAll()
         {
             //if (DateTime.Now.Hour == 23)
@@ -43,6 +47,7 @@ namespace Business.Concrete
             return new SuccessDataResult<List<Product>>(_productDal.GetAll(p => p.CategoryId == id));
         }
 
+        [CacheAspect]
         public IDataResult<Product> GetByID(int id)
         {
             return new SuccessDataResult<Product>(_productDal.Get(p => p.ProductId == id));
@@ -62,6 +67,8 @@ namespace Business.Concrete
 
         //Cross cutting concerns - Log, cache, transaction yönetimi, authorization
 
+        [CacheRemoveAspect("IProductService.Get")]
+        [SecuredOperation("product.add,admin")]
         [ValidationAspect(typeof(ProductValidator))] // typeof ile attribute a tip atıyoruz
         public IResult Add(Product product)
         {
@@ -85,6 +92,7 @@ namespace Business.Concrete
             return new SuccessResult();
         }
 
+        [CacheRemoveAspect("IProductService.Get")]
         [ValidationAspect(typeof(ProductValidator))]
         public IResult Update(Product product)
         {
@@ -130,6 +138,12 @@ namespace Business.Concrete
                 return new ErrorResult(Messages.CategoryLimitExceeded);
             }
             return new SuccessResult();
+        }
+
+        [TransactionScopeAspect]
+        public IResult AddTransactionalTest(Product product)
+        {
+            throw new NotImplementedException();
         }
     }
 }
