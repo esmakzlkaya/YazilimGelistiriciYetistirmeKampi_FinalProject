@@ -143,7 +143,12 @@ namespace Business.Concrete
         [TransactionScopeAspect]
         public IResult AddTransactionalTest(Product product)
         {
-            throw new NotImplementedException();
+            _productDal.Add(product);
+            if (product.UnitPrice<5)
+            {
+                throw new Exception("Birim fiyatı 5'den küçük olamaz!");
+            }
+            return new SuccessResult(Messages.TransactionSucceed);
         }
     }
 }

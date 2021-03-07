@@ -61,7 +61,16 @@ namespace WebAPI.Controllers
             }
             return BadRequest(result);
         }
-
+        [HttpPost("transaction")]
+        public IActionResult AddTransactionalTest(Product product)
+        {
+            var result = _productService.AddTransactionalTest(product);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result);
+        }
         //güncelleme için de post kullanabiliriz 
         //sektörde silme ve güncelleme için de çoğunlukla post kullanılır
         //ayırmak istersek, put = güncelleme, delete = silme için
