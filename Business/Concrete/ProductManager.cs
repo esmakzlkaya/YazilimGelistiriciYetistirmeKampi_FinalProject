@@ -68,7 +68,7 @@ namespace Business.Concrete
         //Cross cutting concerns - Log, cache, transaction yönetimi, authorization
 
         //[CacheRemoveAspect("IProductService.Get")]
-        //[SecuredOperation("product.add,admin")]
+        [SecuredOperation("product.add,admin")]
         [ValidationAspect(typeof(ProductValidator))] // typeof ile attribute a tip atıyoruz
         public IResult Add(Product product)
         {
